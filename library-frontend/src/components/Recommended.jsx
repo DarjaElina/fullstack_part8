@@ -1,39 +1,39 @@
 import { useQuery } from '@apollo/client'
-import { RECOMMENDED_BOOKS } from '../queries'
+import { useContext } from 'react'
+import { ALL_BOOKS } from '../queries'
+
+import UserContext from '../context/UserContext'
 
 
-const Recommended = ( { genre }) => {
+const Recommended = () => {
 
-  
-  const result = useQuery(RECOMMENDED_BOOKS, {
-    variables: { genre }
+  const user = useContext(UserContext)
+
+  const booksData = useQuery(ALL_BOOKS, {
+    variables: { genre: user?.favouriteGenre }
   })
 
-  if (!genre) {
-   return null
-  }
-
-  if (result.error) {
+  if (booksData.error) {
     return (
       <div>
-        Error getching recommended books...
+        Error fetching books...
       </div>
     )
   }
 
-  if (result.loading) {
+  if (booksData.loading) {
     return (
       <div>Loading recommended books...</div>
     )
   }
 
-  const recommended = result.data.allBooks
+  const recommended = booksData.data.allBooks
 
   return (
     <>
       <h2>recommendations</h2>
 
-      <p>books in your favourite genre <b>{genre}</b></p>
+      <p>books in your favourite genre <b>{user?.favouriteGenre}</b></p>
 
       <table>
         <tbody>

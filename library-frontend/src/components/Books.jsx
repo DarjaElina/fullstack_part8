@@ -1,34 +1,28 @@
 import { useQuery } from "@apollo/client"
 import { ALL_BOOKS } from "../queries"
-import { useState } from "react"
+import { useState } from 'react'
+
+import Filters from './Filters'
 
 const Books = () => {
-  const [genre, setGenre] = useState('')
-  const { loading, data, refetch } = useQuery(ALL_BOOKS)
-
-  if (loading) {
-    return <div>Loading books...</div>
+  const [currentGenre, setCurrentGenre] = useState('')
+  const bookData = useQuery(ALL_BOOKS)
+  if (bookData.loading) {
+    return <div>Loading...</div>
   }
 
-  const books = data.allBooks
+  const books = bookData.data.allBooks
 
-  const arr = []
-
-  books.map(b => {
-    b.genres.map(item => arr.push(item))
-  })
-  const genres = Array.from(new Set(arr))
-
-  const handleClick = (genre) => {
-    refetch({genre})
-    setGenre(genre)
+  const setGenre = (genre) => {
+    bookData.refetch({ genre })
+    setCurrentGenre(genre)
   }
 
   return (
     <div>
       <h2>books</h2>
 
-    {genre && <p>in genre <b>{genre}</b></p>}
+    {currentGenre && <p>in genre <b>{currentGenre}</b></p>}
       <table>
         <tbody>
           <tr>
@@ -46,14 +40,7 @@ const Books = () => {
         </tbody>
       </table>
     <div>
-      {genres.map(g => (
-        <button
-          key={g}
-          onClick={() => handleClick(g)}>
-            {g}
-        </button>
-      ))}
-      <button onClick={() => handleClick('')}>all</button>
+      <Filters setGenre={setGenre}/>
       </div>
     </div>
   )

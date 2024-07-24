@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useMutation } from '@apollo/client'
+import { useMutation, useApolloClient } from '@apollo/client'
 import { LOGIN, ME } from '../queries'
 
 import { useNavigate } from 'react-router-dom'
@@ -9,16 +9,18 @@ const LoginForm = ({ setToken }) => {
   const [password, setPassword] = useState('')
   const navigate = useNavigate()
 
-  const [ login, result ] = useMutation(LOGIN)
+  const client = useApolloClient()
 
-  
-
+  const [ login, result ] = useMutation(LOGIN, {
+    refetchQueries: [{ ME }]
+  })
 
 
   useEffect(() => {
     if (result.data) {
       const token = result.data.login.value
       setToken(token)
+      client.resetStore()
       localStorage.setItem('library-user-token', token)
       navigate('/')
     }
